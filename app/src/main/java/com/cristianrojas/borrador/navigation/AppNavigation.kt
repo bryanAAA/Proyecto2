@@ -28,7 +28,7 @@ fun AppNavigation(
         composable("home") { HomeScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
-        composable("menu") { MenuScreen(navController) }
+        composable("menu") { MenuScreen() }
         composable("ordenar") { OrdenarScreen(navController) }
         composable("reserva") { ReservaScreen(navController, reservaViewModel) }
         composable("reserva_form") { ReservaFormScreen(navController, reservaViewModel) }
