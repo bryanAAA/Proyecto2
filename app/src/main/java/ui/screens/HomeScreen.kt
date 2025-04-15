@@ -9,9 +9,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.cristianrojas.borrador.ImageCarousel
+import com.cristianrojas.borrador.R
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    val images = listOf(
+        R.drawable.restaurante1,
+        R.drawable.restaurante2,
+        R.drawable.restaurante3
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -19,6 +27,11 @@ fun HomeScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        ImageCarousel(imageList = images)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = "Bienvenido a BugFree Burgers",
             style = MaterialTheme.typography.headlineMedium,
