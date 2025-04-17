@@ -14,7 +14,7 @@ fun AppNavigation(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    // ✅ Usa tu Factory personalizada que necesita Context
+
     val context = navController.context
     val reservaViewModel: ReservaViewModel = viewModel(
         factory = ReservaViewModel.provideFactory(context)
@@ -29,6 +29,7 @@ fun AppNavigation(
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("menu") { MenuScreen() }
+        composable("carrito") { CarritoScreen(navController) }
         composable("ordenar") { OrdenarScreen(navController) }
         composable("reserva") { ReservaScreen(navController, reservaViewModel) }
         composable("reserva_form") { ReservaFormScreen(navController, reservaViewModel) }

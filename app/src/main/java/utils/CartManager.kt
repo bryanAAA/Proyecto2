@@ -1,7 +1,7 @@
 package utils
 
 import kotlinx.coroutines.*
-import kotlin.system.*
+
 
 object CartManager {
     private val cart = mutableMapOf<String, Int>()
@@ -27,6 +27,9 @@ object CartManager {
         job = null
     }
 
+    fun getCantidad(nombre: String): Int {
+        return cart[nombre] ?: 0
+    }
     private fun startClearTimer() {
         job = CoroutineScope(Dispatchers.Default).launch {
             delay(30 * 60 * 1000) // 30 minutos
