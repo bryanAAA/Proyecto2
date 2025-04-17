@@ -73,16 +73,19 @@ fun CarritoScreen(navController: NavController) {
             }
 
             // Botón para ir a pagos
-            Button(
-                onClick = {
-                    navController.navigate("pago")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-                Text("Proceder al pago")
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (carrito.isNotEmpty()) {
+                Button(
+                    onClick = { navController.navigate("pago") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Proceder al Pago")
+                }
             }
+
         }
 
         Spacer(modifier = Modifier.height(12.dp))
