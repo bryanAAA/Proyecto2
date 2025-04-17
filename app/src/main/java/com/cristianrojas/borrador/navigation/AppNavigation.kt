@@ -34,5 +34,7 @@ fun AppNavigation(
         composable("reserva") { ReservaScreen(navController, reservaViewModel) }
         composable("reserva_form") { ReservaFormScreen(navController, reservaViewModel) }
         composable("roles") { ManejoRolesScreen(navController) }
+        composable("pago") { PantallaPago(navController) }
+
     }
 }
