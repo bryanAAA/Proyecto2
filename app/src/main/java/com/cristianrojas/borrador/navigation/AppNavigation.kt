@@ -35,6 +35,12 @@ fun AppNavigation(
         composable("reserva_form") { ReservaFormScreen(navController, reservaViewModel) }
         composable("roles") { ManejoRolesScreen(navController) }
         composable("pago") { PantallaPago(navController) }
+        composable("factura/{nombre}/{tarjeta}") { backStackEntry ->
+            val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+            val tarjeta = backStackEntry.arguments?.getString("tarjeta") ?: ""
+            FacturaScreen(navController, nombre, tarjeta)
+        }
+
 
     }
 }
