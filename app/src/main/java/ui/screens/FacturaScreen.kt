@@ -1,29 +1,34 @@
 package ui.screens
 
+import android.content.Intent
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import utils.CartManager
-import android.graphics.pdf.PdfDocument
-import android.graphics.Paint
 import java.io.File
 import java.io.FileOutputStream
-import utils.getFacturaOutputStream
-
-
 
 @Composable
 fun FacturaScreen(navController: NavController, nombreCliente: String, numeroTarjeta: String) {
+    val context = LocalContext.current
     val carrito = CartManager.getCart()
     val subtotal = carrito.entries.sumOf { it.value * extraerPrecio(it.key) }
     val tarjetaCensurada = "XXXX-XXXX-XXXX-" + numeroTarjeta.takeLast(4)
+    var correoUsuario by remember { mutableStateOf(TextFieldValue()) }
 
     Column(
         modifier = Modifier
@@ -31,7 +36,7 @@ fun FacturaScreen(navController: NavController, nombreCliente: String, numeroTar
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Pago realizado con éxito", color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 18.sp)
+        Text("Pago realizado con éxito", color = MaterialTheme.colorScheme.primary, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(6.dp)) {
@@ -63,6 +68,15 @@ fun FacturaScreen(navController: NavController, nombreCliente: String, numeroTar
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = correoUsuario,
+            onValueChange = { correoUsuario = it },
+            label = { Text("Correo del destinatario") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -75,10 +89,10 @@ fun FacturaScreen(navController: NavController, nombreCliente: String, numeroTar
             }
 
             Button(onClick = {
-                val context = navController.context
-                val fileName = "factura_bugfreeburgers.pdf"
-
                 try {
+                    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    val fileName = "factura_bugfreeburgers.pdf"
+                    val file = File(downloadsDir, fileName)
                     val pdfDocument = PdfDocument()
                     val pageInfo = PdfDocument.PageInfo.Builder(300, 600, 1).create()
                     val page = pdfDocument.startPage(pageInfo)
@@ -101,7 +115,6 @@ fun FacturaScreen(navController: NavController, nombreCliente: String, numeroTar
 
                     canvas.drawText("Productos Ordenados:", 10f, y.toFloat(), paint)
                     y += 20
-
                     carrito.entries.forEach {
                         val nombre = it.key
                         val cantidad = it.value
@@ -115,27 +128,51 @@ fun FacturaScreen(navController: NavController, nombreCliente: String, numeroTar
                     canvas.drawText("Total: ₡$subtotal", 10f, y.toFloat(), paint)
 
                     pdfDocument.finishPage(page)
-
-                    val outputStream = getFacturaOutputStream(context, fileName)
-                    outputStream?.let {
-                        pdfDocument.writeTo(it)
-                        Toast.makeText(context, "Factura guardada en Descargas", Toast.LENGTH_LONG).show()
-                    } ?: Toast.makeText(context, "No se pudo guardar la factura", Toast.LENGTH_SHORT).show()
-
+                    pdfDocument.writeTo(FileOutputStream(file))
                     pdfDocument.close()
+
+                    Toast.makeText(context, "Factura guardada en ${file.absolutePath}", Toast.LENGTH_LONG).show()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(navController.context, "Error al guardar factura", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Error al guardar la factura", Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Text("Descargar Factura")
             }
 
-
-
             Button(onClick = {
-                Toast.makeText(navController.context, "Factura enviada por correo.", Toast.LENGTH_SHORT).show()
-            }) {
+                try {
+                    val facturaTexto = buildString {
+                        append("Factura - BugFree Burgers\n")
+                        append("Teléfono: +506 8888-8888\n\n")
+                        append("Detalles del Cliente:\n")
+                        append("Nombre: $nombreCliente\n")
+                        append("Número de Tarjeta: $tarjetaCensurada\n\n")
+                        append("Productos Ordenados:\n")
+                        carrito.entries.forEach {
+                            val cantidad = it.value
+                            val precio = extraerPrecio(it.key)
+                            val total = cantidad * precio
+                            append("- ${it.key} x$cantidad = ₡$total\n")
+                        }
+                        append("\nTotal: ₡$subtotal\n")
+                        append("\n¡Gracias por tu compra!\nBugFree Burgers")
+                    }
+
+                    val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "message/rfc822" // Usa apps de correo electrónico
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf(correoUsuario.text))
+                        putExtra(Intent.EXTRA_SUBJECT, "Factura - BugFree Burgers")
+                        putExtra(Intent.EXTRA_TEXT, facturaTexto)
+                    }
+
+                    context.startActivity(Intent.createChooser(emailIntent, "Enviar factura por correo"))
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(context, "Error al enviar la factura", Toast.LENGTH_SHORT).show()
+                }
+            }, enabled = correoUsuario.text.isNotBlank()) {
                 Text("Enviar por Correo")
             }
         }
