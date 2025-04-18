@@ -1,25 +1,24 @@
 package ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import utils.CartManager
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import android.widget.Toast
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import android.widget.Toast
 import com.cristianrojas.borrador.R
-
+import utils.CartManager
 
 @Composable
 fun PantallaPago(navController: NavController) {
@@ -53,9 +52,6 @@ fun PantallaPago(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Campos de formulario
-        Spacer(modifier = Modifier.height(16.dp))
-
         var nombreTarjeta by remember { mutableStateOf("") }
         var numeroTarjeta by remember { mutableStateOf("") }
         var fechaExpiracion by remember { mutableStateOf("") }
@@ -72,7 +68,6 @@ fun PantallaPago(navController: NavController) {
             singleLine = true,
             shape = MaterialTheme.shapes.medium
         )
-
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -91,7 +86,6 @@ fun PantallaPago(navController: NavController) {
             shape = MaterialTheme.shapes.medium
         )
 
-
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
@@ -109,7 +103,6 @@ fun PantallaPago(navController: NavController) {
             shape = MaterialTheme.shapes.medium
         )
 
-
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
@@ -123,9 +116,9 @@ fun PantallaPago(navController: NavController) {
             singleLine = true,
             shape = MaterialTheme.shapes.medium
         )
+
         Spacer(modifier = Modifier.height(24.dp))
 
-        // === Validacion activa para deshabilitar boton ===
         val regexTarjeta = Regex("^\\d{16}$")
         val regexFecha = Regex("^(0[1-9]|1[0-2])/\\d{2}$")
         val regexCVV = Regex("^\\d{3}$")
@@ -186,17 +179,13 @@ fun PantallaPago(navController: NavController) {
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    CartManager.clearCart()
-
                     Toast.makeText(
                         navController.context,
-                        "¡Orden realizada con éxito!",
-                        Toast.LENGTH_LONG
+                        "Procesando pago...",
+                        Toast.LENGTH_SHORT
                     ).show()
 
-                    navController.navigate("home") {
-                        popUpTo("carrito") { inclusive = true }
-                    }
+                    navController.navigate("factura/${nombreTarjeta.trim()}/${numeroTarjeta.trim()}")
                 }
             },
             enabled = puedePagar,
@@ -206,8 +195,5 @@ fun PantallaPago(navController: NavController) {
         ) {
             Text("Realizar Orden")
         }
-
-
-
     }
 }

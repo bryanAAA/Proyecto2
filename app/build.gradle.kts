@@ -52,6 +52,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager:0.33.2-alpha")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.33.2-alpha")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("com.itextpdf:itext7-core:8.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
