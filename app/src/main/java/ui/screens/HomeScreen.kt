@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -12,10 +13,14 @@ import androidx.navigation.NavController
 import com.cristianrojas.borrador.ImageCarousel
 import com.cristianrojas.borrador.R
 import androidx.compose.ui.unit.sp
+import utils.SessionManager
 
 
 @Composable
 fun HomeScreen(navController: NavController) {
+
+
+
     val images = listOf(
         R.drawable.restaurante1,
         R.drawable.restaurante2,

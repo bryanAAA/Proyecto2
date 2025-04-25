@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.cristianrojas.borrador.R
 import utils.CartManager
+import utils.SessionManager
 
 data class MenuItem(
     val name: String,
@@ -28,6 +29,19 @@ data class MenuItem(
 
 @Composable
 fun OrdenarScreen(navController: NavController) {
+    LaunchedEffect(Unit) {
+        // Example: Load session or user data
+        val user = SessionManager.currentUser
+        if (user == null) {
+            // Navigate to login if no session
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
+            }
+        } else {
+            println("User is logged in: ${user.nombre}")
+        }
+    }
+
     val menuItems = remember {
         mutableStateListOf(
             MenuItem("The Debugger", "₡7950", R.drawable.burger1),

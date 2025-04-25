@@ -9,11 +9,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import utils.SessionManager
 import viewmodel.ReservaViewModel
 
 @Composable
 fun ReservaScreen(navController: NavController, viewModel: ReservaViewModel) {
+
     LaunchedEffect(Unit) {
+        // Example: Load session or user data
+        val user = SessionManager.currentUser
+        if (user == null) {
+            // Navigate to login if no session
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
+            }
+        } else {
+            println("User is logged in: ${user.nombre}")
+        }
         viewModel.cargarReservas()
     }
 

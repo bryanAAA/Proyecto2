@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import model.Reserva
+import model.Usuario
 
 class ReservaDao(private val context: Context) {
 
@@ -20,6 +21,51 @@ class ReservaDao(private val context: Context) {
         }
         db.insert(DBContract.ReservaEntry.TABLE_NAME, null, values)
         db.close()
+    }
+
+    fun insertarUsuario(usuario: String, password: ByteArray) {
+        val db = dbHelper.writableDatabase
+
+        val userValues = ContentValues().apply {
+            put(DBContract.UserEntry.COLUMN_NOMBRE, usuario)
+            put(DBContract.UserEntry.COLUMN_PASSWORD, password)  // Store encrypted password as ByteArray
+        }
+        db.insert(DBContract.UserEntry.TABLE_NAME, null, userValues)
+        val reservaValues = ContentValues().apply {
+        }
+        db.insert(DBContract.ReservaEntry.TABLE_NAME, null, reservaValues)
+
+        db.close()
+    }
+
+
+    fun login(usuario: String, password: String): Boolean {
+        val db = dbHelper.readableDatabase
+        val cursor = db.query(
+            DBContract.UserEntry.TABLE_NAME,
+            arrayOf(DBContract.UserEntry.COLUMN_PASSWORD),
+            "${DBContract.UserEntry.COLUMN_NOMBRE} = ?",
+            arrayOf(usuario),
+            null, null, null
+        )
+        var encryptedPassword: ByteArray? = null
+
+        var usuario: Usuario? = null
+        if (cursor.moveToFirst()) {
+            encryptedPassword = cursor.getBlob(cursor.getColumnIndex(DBContract.UserEntry.COLUMN_PASSWORD))
+        }else{
+            return false
+        }
+        val security = security.authentication();
+        if(cursor.moveToFirst()){
+            val passworddb = security.AESGCMDecrypter(encryptedPassword!!, security.getKeyFromPassword("mySecretPassword",ByteArray(16)))
+            if(password == passworddb){
+                cursor.close()
+                return true
+            }
+        }
+        cursor.close()
+        return false
     }
 
     fun obtenerTodas(): List<Reserva> {
