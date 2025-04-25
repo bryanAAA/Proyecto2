@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import model.Usuario
 import utils.SessionManager
 
@@ -80,15 +81,21 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(24.dp))
                 val authentication = authentication()
                 val user:Usuario
+                val data = Data.ReservaDao(LocalContext.current);
                 Button(
                     onClick = {
                         if (usuario.nombre.isNotBlank() && usuario.password.isNotBlank()) {
-                            SessionManager.currentUser = usuario
-                            println("Logged in as: ${SessionManager.currentUser?.nombre}")
-                            navController.navigate("home")
+                            if(data.login(usuario.nombre,usuario.password)){
+                                SessionManager.currentUser = usuario
+                                println("Logged in as: ${SessionManager.currentUser?.nombre}")
+                                navController.navigate("home")
+                            }else{
+                                println("Usuario Incorrecto");
+                            }
+
                         }   else
                         {
-                            var result_encrypted = authentication.AESGCMEncrypterUser(usuario)
+                            println("Usuario Incorrecto");
                         }
                     },
                     modifier = Modifier
@@ -102,8 +109,10 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextButton(onClick = {
+                    navController.navigate("register")
                 }) {
                     Text("¿No tienes una cuenta? ¡Registrate!")
+
                 }
             }
         }
